@@ -7,16 +7,13 @@ import (
 
 const bitDivider = 257 // 16 bit to 8 bit divider
 
-// Pixel struct example
-
-
 func rgbaToPixel(R uint32, G uint32, B uint32, A uint32) Pixel {
 	r := uint8(R / bitDivider)
 	g := uint8(G / bitDivider)
 	b := uint8(B / bitDivider)
-	brightness := colortools.GetRGBBrightNess(colortools.ColorPixel{r, g, b})
+	brightness := colortools.GetRGBBrightNess(r, g, b)
 
-	return Pixel{R, G, B, A, brightness, false, false, false}
+	return Pixel{R, G, B, A, brightness, false, false, false, false, false, -1, -1}
 }
 
 // Get the bi-dimensional pixel array and image width and height
@@ -29,7 +26,9 @@ func getPixels(img image.Image) ([][]Pixel, int, int) {
 	for y := 0; y < height; y++ {
 		var row []Pixel
 		for x := 0; x < width; x++ {
-			row = append(row, rgbaToPixel(img.At(x, y).RGBA()))
+			R, G, B, A := img.At(x, y).RGBA()
+			column := rgbaToPixel(R, G, B, A)
+			row = append(row, column)
 		}
 		pixels = append(pixels, row)
 	}

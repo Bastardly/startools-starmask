@@ -1,12 +1,8 @@
 package colortools
 
-import "math"
-
-type ColorPixel struct {
-	R uint8
-	G uint8
-	B uint8
-}
+import (
+	"math"
+)
 
 /**
  * Hvis vi arbejder med få farver, skal de første farver have en god kontrast.
@@ -29,9 +25,10 @@ const luminanceBias float32 = 0.05
 
 //  https://stackoverflow.com/questions/9733288/how-to-programmatically-calculate-the-contrast-ratio-between-two-colors
 func getBrightnessFactor(v uint8) float32 {
-	V := float32(v / 255)
+	V := float32(v) / float32(255)
 
 	if V <= comparer {
+
 		return V / divider
 	}
 
@@ -39,10 +36,10 @@ func getBrightnessFactor(v uint8) float32 {
 }
 
 // GetRGBBrightNess Tager farvelysstyrken i en skala fra 0 - 1 ved hver farve, og returnerer WCAG ratio
-func GetRGBBrightNess(color ColorPixel) float32 {
-	r := getBrightnessFactor(color.R) * rBrightnessFactor
-	g := getBrightnessFactor(color.G) * gBrightnessFactor
-	b := getBrightnessFactor(color.B) * bBrightnessFactor
+func GetRGBBrightNess(R, G, B uint8) float32 {
+	r := getBrightnessFactor(R) * rBrightnessFactor
+	g := getBrightnessFactor(G) * gBrightnessFactor
+	b := getBrightnessFactor(B) * bBrightnessFactor
 
 	return r + g + b
 }
