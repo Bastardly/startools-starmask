@@ -10,8 +10,12 @@ import (
 
 func main() {
 	a := app.New()
-	myWindow := a.NewWindow("Clock")
+
+	myWindow := a.NewWindow("Star Killer 3000")
 	myWindow.Resize(fyne.NewSize(800, 600))
+
+	r, _ := fyne.LoadResourceFromPath("Icon2.png")
+	myWindow.SetIcon(r)
 
 	title := getText("STAR KILLER 3000")
 	title.TextSize = 30
