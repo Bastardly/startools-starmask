@@ -24,15 +24,16 @@ func (store *Store) fillStore(img image.Image) {
 }
 
 func (store Store) maskPixels(starIndexStart, starIndexEnd, row, column int, isVertical bool) {
-	radius := (starIndexEnd - starIndexStart) / 2
 
 	for i := starIndexStart; i <= starIndexEnd; i++ {
 		if isVertical {
 			store.Pixels[i][column].HasContrastChangeVertical = true
-			store.Pixels[i][column].starRadiusVertical = radius
+			store.Pixels[i][column].starRadiusStartVertical = starIndexStart
+			store.Pixels[i][column].starRadiusEndVertical = starIndexEnd
 		} else {
 			store.Pixels[row][i].HasContrastChangeHorizontal = true
-			store.Pixels[row][i].starRadiusHorizontal = radius
+			store.Pixels[row][i].starRadiusStartHorizontal = starIndexStart
+			store.Pixels[row][i].starRadiusEndHorizontal = starIndexEnd
 		}
 	}
 }
@@ -178,8 +179,7 @@ func (store Store) findBrightestConnectedPixelPosition(row, column int) (int, in
 	return bestRow, bestCol
 }
 
-func (store Store) addGlowToStarAlpha() {
-
+func (store Store) findStarCenters() {
 	for row := 0; row < store.Height; row++ {
 
 		for column := 0; column < store.Width; column++ {
@@ -189,8 +189,7 @@ func (store Store) addGlowToStarAlpha() {
 			}
 
 			bestRow, bestCol := store.findBrightestConnectedPixelPosition(row, column)
-			store.Pixels[bestRow][bestCol].Rejected = true
-
+			store.Pixels[bestRow][bestCol].isStarCenter = true
 		}
 	}
 }

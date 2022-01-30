@@ -4,25 +4,6 @@ import (
 	"math"
 )
 
-/**
- * Hvis vi arbejder med få farver, skal de første farver have en god kontrast.
- * AA er en ration på over 4,5 (Stor tekst)
- * AAA er en ratio på over 7 (Lille tekst)
- * https://webaim.org/resources/contrastchecker/
- * https://dev.to/alvaromontoro/building-your-own-color-contrast-checker-4j7o
- */
-
-// Constants to calculate WCAG ratios
-const comparer float32 = 0.03928
-const divider float32 = 12.92
-const bias float32 = 0.055
-const biasDivider float32 = 1.055
-const power float64 = 2.4
-const rBrightnessFactor float32 = 0.2126
-const gBrightnessFactor float32 = 0.7152
-const bBrightnessFactor float32 = 0.0722
-const luminanceBias float32 = 0.05
-
 //  https://stackoverflow.com/questions/9733288/how-to-programmatically-calculate-the-contrast-ratio-between-two-colors
 func getBrightnessFactor(v uint8) float32 {
 	V := float32(v) / float32(255)
@@ -35,7 +16,7 @@ func getBrightnessFactor(v uint8) float32 {
 	return float32(math.Pow(float64((V+bias)/biasDivider), power))
 }
 
-// GetRGBBrightNess Tager farvelysstyrken i en skala fra 0 - 1 ved hver farve, og returnerer WCAG ratio
+// GetRGBBrightNess calculates the brightness at a scale from 0 - 1, and returns the sum of all RGB colors
 func GetRGBBrightNess(R, G, B uint8) float32 {
 	r := getBrightnessFactor(R) * rBrightnessFactor
 	g := getBrightnessFactor(G) * gBrightnessFactor
@@ -44,7 +25,7 @@ func GetRGBBrightNess(R, G, B uint8) float32 {
 	return r + g + b
 }
 
-// GetContrastRatio tager farvelysstyrken i en skala fra 0 - 1 ved hver farve, og returnerer WCAG ratio
+// GetContrastRatio tager farvelysstyrken i en skala fra 0 - 1, and returns the WCAG contrast ratio (Scale for natual contrast for the naked eye)
 func GetContrastRatio(brightness1, brightness2 float32) float32 {
 	b1 := brightness1 + luminanceBias
 	b2 := brightness2 + luminanceBias

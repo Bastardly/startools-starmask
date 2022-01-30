@@ -1,7 +1,6 @@
 package imagerunner
 
 import (
-	"fmt"
 	"image"
 	"sync"
 )
@@ -22,7 +21,6 @@ func Start(img image.Image) ([][]Pixel, int, int) {
 	store.fillStore(img)
 
 	var wg sync.WaitGroup
-	// Todo go routines and waitGroups
 
 	wg.Add(2)
 	go store.mapAlphaAreasHorizontal(&wg)
@@ -30,7 +28,7 @@ func Start(img image.Image) ([][]Pixel, int, int) {
 
 	wg.Wait()
 
-	store.addGlowToStarAlpha()
+	store.findStarCenters()
 
 	return store.Pixels, store.Width, store.Height
 }
