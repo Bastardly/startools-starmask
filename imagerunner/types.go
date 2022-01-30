@@ -20,3 +20,13 @@ type Settings struct {
 	maxStarGlowInPx     int
 	wcagContrastMinimum float32 // The highter the star contrast is needed for detection.
 }
+
+type Pixels = [][]Pixel
+
+type Store struct {
+	Width int
+	Height int
+	settings Settings
+	Pixels   [][]Pixel
+
+}

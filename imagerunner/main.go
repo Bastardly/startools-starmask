@@ -5,19 +5,24 @@ import (
 )
 
 func Start(img image.Image) ([][]Pixel, int, int) {
-	pixels, width, height := getPixels(img)
-
-	// Todo, make this a parameter and pass these values from UI
 	mockSettings := Settings{
 		maxStarSizeInPx:     12,
 		maxStarGlowInPx:     3,
 		wcagContrastMinimum: 1.6,
 	}
 
-	// Todo go routines and waitGroups
-	mapAlphaAreasHorizontal(pixels, width, height, mockSettings)
-	mapAlphaAreasVertical(pixels, width, height, mockSettings)
-	addGlowToStarAlpha(pixels, width, height, mockSettings)
+	var store = Store{
+		0, 0,
+		mockSettings,
+		[][]Pixel{},
+	}
 
-	return pixels, width, height
+	store.fillStore(img)
+
+	// Todo go routines and waitGroups
+	store.mapAlphaAreasHorizontal()
+	store.mapAlphaAreasVertical()
+	store.addGlowToStarAlpha()
+
+	return store.Pixels, store.Width, store.Height
 }
