@@ -1,8 +1,10 @@
 package imagerunner
 
 import (
+	"fmt"
 	"image"
 	"starkiller/colortools"
+	"sync"
 )
 
 func (store *Store) fillStore(img image.Image) {
@@ -36,8 +38,8 @@ func (store Store) maskPixels(starIndexStart, starIndexEnd, row, column int, isV
 	}
 }
 
-func (store Store) mapAlphaAreasHorizontal() {
-
+func (store Store) mapAlphaAreasHorizontal(wg *sync.WaitGroup) {
+	defer wg.Done()
 	// todo lave func med start slut som go routine
 	for row := 0; row < store.Height; row++ {
 		// todo make this as a goRoutine + waitgroup
@@ -78,7 +80,9 @@ func (store Store) mapAlphaAreasHorizontal() {
 	}
 }
 
-func (store Store) mapAlphaAreasVertical() {
+func (store Store) mapAlphaAreasVertical(wg *sync.WaitGroup) {
+
+	defer wg.Done()
 
 	// todo lave func med start slut som go routine
 	for column := 0; column < store.Width; column++ {
