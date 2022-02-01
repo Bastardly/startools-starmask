@@ -82,7 +82,7 @@ func (p *Pixel) markAsStarIfWithinRange(centerRow, centerCol, starRadius, starRo
 	b2 := math.Pow(y, 2)
 	distance := math.Sqrt(a2 + b2)
 
-	p.IsStar = float64(starRadius) < distance
+	p.IsStar = float64(starRadius) > distance
 }
 
 func (p *Pixel) modifyColors(procentage float64, pxR, pxG, pxB, scR, scG, scB uint32) {
