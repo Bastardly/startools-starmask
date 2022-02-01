@@ -25,3 +25,19 @@ func validateCoord(value, fallback int) int {
 
 	return value
 }
+
+func getCorrectStartColsAndRowsIfReversed(startRow, startCol, endRow, endCol int, reverse bool) (int, int, int) {
+	modifier := 1
+	if reverse {
+		modifier = -1
+	}
+	rowS := startRow
+	colS := startCol
+
+	if reverse {
+		rowS = endRow
+		colS = endCol
+	}
+
+	return modifier, rowS, colS
+}

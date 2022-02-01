@@ -280,6 +280,7 @@ func (store Store) markStarAreas(centerRow, centerCol, startRow, startCol, endRo
 				defer wg.Done()
 				if goRow < 0 || goRow >= store.Height || goCol < 0 || goCol >= store.Width {
 					fmt.Println(goCol, goRow)
+					panic("Fuck arse!")
 				}
 
 				store.Pixels[goRow][goCol].markAsStarIfWithinRange(centerRow, centerCol, starRadius, goRow, goCol)
@@ -292,67 +293,100 @@ func (store Store) markStarAreas(centerRow, centerCol, startRow, startCol, endRo
 }
 
 func (store Store) getPixelColorFromCoords(row, col int) (uint32, uint32, uint32) {
+
+	if row < 0 || col < 0 || row >= store.Height || col > store.Width {
+		fmt.Println(row, store.Height, col, store.Width)
+		panic("Fuuuuck")
+	}
+
 	p := store.Pixels[row][col]
 
-	return p.R, p.G, p.G
+	return p.R, p.G, p.B
 }
 
 func (store Store) maskStarArea(startRow, startCol, endRow, endCol int) {
+	numberOfRows := endRow - startRow
+	numberOfCols := endCol - startCol
+
+	if numberOfCols < 1 || numberOfRows < 1 {
+		return
+	}
+
 	var wg sync.WaitGroup
-	numberOfRows := math.Abs(float64(startRow) - float64(endRow))
-	numberOfCols := int(math.Abs(float64(startCol)-float64(endCol))) + 1
-	procentagePrStep := numberOfRows / hundred
+	numberOfRowsF64 := float64(numberOfRows)
+	numberOfColsF64 := float64(numberOfCols)
 
 	horizontal := func(reverse bool) {
 		defer wg.Done()
-		rowS := startRow
-		rowE := endRow
-		colS := startCol
-		colE := endCol
-
-		if reverse {
-			rowS = endRow
-			rowE = startRow
-			colS = endCol
-			colE = startCol
-		}
-
+		modifier, rowS, colS := getCorrectStartColsAndRowsIfReversed(startRow, startCol, endRow, endCol, reverse)
 		// For each column, I need to find the row that contains the color I want.
-		colorRowList := make([]int, numberOfCols)
+		colorList := make([]int, numberOfCols+1)
 
-		for row := rowS; row <= rowE; row++ {
-			for col := colS; col <= colE; col++ {
+		for row := 0; row <= numberOfRows; row++ {
+			for col := 0; col <= numberOfCols; col++ {
 				wg.Add(1)
-				colorRowListIndex := col - colS
-				if row == rowS {
-					colorRowList[colorRowListIndex] = rowS
+				targetRow := rowS + (row * modifier)
+				targetCol := colS + (col * modifier)
+				if row == 0 {
+					colorList[col] = targetRow
 				}
-
-				go func(goRow, goCol, colorRowIndex int) {
-
+				go func(goRow, goCol, colorIndex int) {
 					defer wg.Done()
-
 					if store.Pixels[goRow][goCol].IsStar {
-						sourceColorRow := colorRowList[colorRowIndex]
+						sourceColorRow := colorList[colorIndex]
 						pxR, pxG, pxB := store.getPixelColorFromCoords(goRow, goCol)
 						scR, scG, scB := store.getPixelColorFromCoords(sourceColorRow, goCol)
 						distance := math.Abs(float64(sourceColorRow) - float64(goRow))
-						procentage := hundred - distance*procentagePrStep
+						procentage := (numberOfRowsF64 - distance) / numberOfRowsF64
 						store.Pixels[goRow][goCol].modifyColors(procentage, pxR, pxG, pxB, scR, scG, scB)
 
 					} else { // Todo, add row limit 50% or run seriel if results are funky, but I doubt it will be a problem
-
-						colorRowList[colorRowIndex] = goRow
+						colorList[colorIndex] = goRow
 					}
 
-				}(row, col, colorRowListIndex)
+				}(targetRow, targetCol, col)
 			}
 		}
 	}
 
-	wg.Add(2) // One for each direction!
+	vertical := func(reverse bool) {
+		defer wg.Done()
+		modifier, rowS, colS := getCorrectStartColsAndRowsIfReversed(startRow, startCol, endRow, endCol, reverse)
+		// For each column, I need to find the row that contains the color I want.
+		colorList := make([]int, numberOfRows+1)
+
+		for col := 0; col <= numberOfCols; col++ {
+			for row := 0; row <= numberOfRows; row++ {
+				wg.Add(1)
+				targetRow := rowS + (row * modifier)
+				targetCol := colS + (col * modifier)
+				if col == 0 {
+					colorList[row] = targetCol
+				}
+				go func(goRow, goCol, colorIndex int) {
+					defer wg.Done()
+					if store.Pixels[goRow][goCol].IsStar {
+						sourceColorCol := colorList[colorIndex]
+						pxR, pxG, pxB := store.getPixelColorFromCoords(goRow, goCol)
+						scR, scG, scB := store.getPixelColorFromCoords(goRow, sourceColorCol)
+						distance := math.Abs(float64(sourceColorCol) - float64(goCol))
+						procentage := (numberOfColsF64 - distance) / numberOfColsF64
+						store.Pixels[goRow][goCol].modifyColors(procentage, pxR, pxG, pxB, scR, scG, scB)
+
+					} else { // Todo, add row limit 50% or run seriel if results are funky, but I doubt it will be a problem
+						colorList[colorIndex] = goCol
+					}
+
+				}(targetRow, targetCol, row)
+			}
+		}
+	}
+
+	wg.Add(4) // One for each direction!
 	go horizontal(false)
 	go horizontal(true)
+	go vertical(false)
+	go vertical(true)
 
 	//          todo Vertical also!
 
