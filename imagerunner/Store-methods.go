@@ -255,6 +255,7 @@ func (store Store) markStarRadiusAsStar() {
 
 				if store.Pixels[goRow][goCol].isStarCenter {
 					store.Pixels[goRow][goCol].calculateStarRadiusWithGlow(store, goRow, goCol)
+
 					startRow, startCol, endRow, endCol := store.Pixels[goRow][goCol].getSquareMapCoords(store, goRow, goCol)
 					store.markStarAreas(goRow, goCol, startRow, startCol, endRow, endCol)
 				}
@@ -275,6 +276,7 @@ func (store Store) markStarAreas(centerRow, centerCol, startRow, startCol, endRo
 			wg.Add(1)
 
 			go func(goRow, goCol int) {
+
 				defer wg.Done()
 				if goRow < 0 || goRow >= store.Height || goCol < 0 || goCol >= store.Width {
 					fmt.Println(goCol, goRow)
@@ -327,6 +329,7 @@ func (store Store) maskStarArea(startRow, startCol, endRow, endCol int) {
 				}
 
 				go func(goRow, goCol, colorRowIndex int) {
+
 					defer wg.Done()
 
 					if store.Pixels[goRow][goCol].IsStar {
@@ -338,6 +341,7 @@ func (store Store) maskStarArea(startRow, startCol, endRow, endCol int) {
 						store.Pixels[goRow][goCol].modifyColors(procentage, pxR, pxG, pxB, scR, scG, scB)
 
 					} else { // Todo, add row limit 50% or run seriel if results are funky, but I doubt it will be a problem
+
 						colorRowList[colorRowIndex] = goRow
 					}
 
