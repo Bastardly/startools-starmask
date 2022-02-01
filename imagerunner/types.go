@@ -9,12 +9,13 @@ type Pixel struct {
 	HasContrastChangeHorizontal bool
 	HasContrastChangeVertical   bool
 	HasBeenExplored             bool
-	IsGlow                      bool
+	IsStar                      bool
 	isStarCenter                bool // Center of star, from where we will calculate it's final size with glow
 	starRadiusStartHorizontal   int
 	starRadiusEndHorizontal     int
 	starRadiusStartVertical     int
 	starRadiusEndVertical       int
+	starRadius int
 }
 
 type Settings struct {
@@ -30,4 +31,9 @@ type Store struct {
 	Height   int
 	settings Settings
 	Pixels   [][]Pixel
+}
+
+type ColorCoord struct {
+	row int
+	col int
 }

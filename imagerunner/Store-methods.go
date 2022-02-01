@@ -1,7 +1,9 @@
 package imagerunner
 
 import (
+	"fmt"
 	"image"
+	"math"
 	"starkiller/colortools"
 	"sync"
 )
@@ -192,4 +194,163 @@ func (store Store) findStarCenters() {
 			store.Pixels[bestRow][bestCol].isStarCenter = true
 		}
 	}
+}
+
+func (store Store) getHaloFalloffLengthVertical(row, col, modifier, starCoreRadius int) int {
+	prevBrightness := store.Pixels[row][col].brightness
+	result := 0
+
+	if store.settings.maxStarGlowInPx > 0 {
+		for i := 1; i <= store.settings.maxStarGlowInPx; i++ {
+			result = i
+			nextRow := row + i*modifier
+			if nextRow < 0 || nextRow >= store.Height {
+				break
+			}
+			nextBrightness := store.Pixels[nextRow][col].brightness
+			if nextBrightness >= prevBrightness {
+				// it's not a deminishing halo
+				break
+			}
+			prevBrightness = nextBrightness
+		}
+	}
+
+	return result + starCoreRadius + extraPixel
+}
+
+func (store Store) getHaloFalloffLengthHorisontal(row, col, modifier, starCoreRadius int) int {
+	prevBrightness := store.Pixels[row][col].brightness
+	result := 0
+
+	if store.settings.maxStarGlowInPx > 0 {
+		for i := 1; i <= store.settings.maxStarGlowInPx; i++ {
+			result = i
+			nextCol := col + i*modifier
+			if nextCol < 0 || nextCol >= store.Width {
+				break
+			}
+			nextBrightness := store.Pixels[row][nextCol].brightness
+			if nextBrightness >= prevBrightness {
+				// it's not a deminishing halo
+				break
+			}
+			prevBrightness = nextBrightness
+		}
+	}
+
+	return result + starCoreRadius + extraPixel
+}
+
+// markStarRadiusAsStar finds the size of the star + halo, and calls mask star with the calculated area
+func (store Store) markStarRadiusAsStar() {
+	var wg sync.WaitGroup
+
+	for row := 0; row < store.Height; row++ {
+		for col := 0; col < store.Width; col++ {
+			wg.Add(1)
+
+			go func(goRow, goCol int) {
+				defer wg.Done()
+
+				if store.Pixels[goRow][goCol].isStarCenter {
+					store.Pixels[goRow][goCol].calculateStarRadiusWithGlow(store, goRow, goCol)
+					startRow, startCol, endRow, endCol := store.Pixels[goRow][goCol].getSquareMapCoords(store, goRow, goCol)
+					store.markStarAreas(goRow, goCol, startRow, startCol, endRow, endCol)
+				}
+			}(row, col)
+		}
+	}
+
+	wg.Wait()
+}
+
+// markStarAreas marks the area that will be affected by the star masking. Which will be initialised by this method since we have the selection ready.
+func (store Store) markStarAreas(centerRow, centerCol, startRow, startCol, endRow, endCol int) {
+	var wg sync.WaitGroup
+	var starRadius = store.Pixels[centerRow][centerCol].starRadius
+
+	for row := startRow; row <= endRow; row++ {
+		for col := startCol; col <= endCol; col++ {
+			wg.Add(1)
+
+			go func(goRow, goCol int) {
+				defer wg.Done()
+				if goRow < 0 || goRow >= store.Height || goCol < 0 || goCol >= store.Width {
+					fmt.Println(goCol, goRow)
+				}
+
+				store.Pixels[goRow][goCol].markAsStarIfWithinRange(centerRow, centerCol, starRadius, goRow, goCol)
+			}(row, col)
+		}
+	}
+	wg.Wait()
+
+	store.maskStarArea(startRow, startCol, endRow, endCol)
+}
+
+func (store Store) getPixelColorFromCoords(row, col int) (uint32, uint32, uint32) {
+	p := store.Pixels[row][col]
+
+	return p.R, p.G, p.G
+}
+
+func (store Store) maskStarArea(startRow, startCol, endRow, endCol int) {
+	var wg sync.WaitGroup
+	numberOfRows := math.Abs(float64(startRow) - float64(endRow))
+	numberOfCols := int(math.Abs(float64(startCol)-float64(endCol))) + 1
+	procentagePrStep := numberOfRows / hundred
+
+	horizontal := func(reverse bool) {
+		defer wg.Done()
+		rowS := startRow
+		rowE := endRow
+		colS := startCol
+		colE := endCol
+
+		if reverse {
+			rowS = endRow
+			rowE = startRow
+			colS = endCol
+			colE = startCol
+		}
+
+		// For each column, I need to find the row that contains the color I want.
+		colorRowList := make([]int, numberOfCols)
+
+		for row := rowS; row <= rowE; row++ {
+			for col := colS; col <= colE; col++ {
+				wg.Add(1)
+				colorRowListIndex := col - colS
+				if row == rowS {
+					colorRowList[colorRowListIndex] = rowS
+				}
+
+				go func(goRow, goCol, colorRowIndex int) {
+					defer wg.Done()
+
+					if store.Pixels[goRow][goCol].IsStar {
+						sourceColorRow := colorRowList[colorRowIndex]
+						pxR, pxG, pxB := store.getPixelColorFromCoords(goRow, goCol)
+						scR, scG, scB := store.getPixelColorFromCoords(sourceColorRow, goCol)
+						distance := math.Abs(float64(sourceColorRow) - float64(goRow))
+						procentage := hundred - distance*procentagePrStep
+						store.Pixels[goRow][goCol].modifyColors(procentage, pxR, pxG, pxB, scR, scG, scB)
+
+					} else { // Todo, add row limit 50% or run seriel if results are funky, but I doubt it will be a problem
+						colorRowList[colorRowIndex] = goRow
+					}
+
+				}(row, col, colorRowListIndex)
+			}
+		}
+	}
+
+	wg.Add(2) // One for each direction!
+	go horizontal(false)
+	go horizontal(true)
+
+	//          todo Vertical also!
+
+	wg.Wait()
 }

@@ -29,6 +29,7 @@ func Start(img image.Image) ([][]Pixel, int, int) {
 	wg.Wait()
 
 	store.findStarCenters()
+	store.markStarRadiusAsStar()
 
 	return store.Pixels, store.Width, store.Height
 }

@@ -37,6 +37,7 @@ func selectFile() {
 		} else {
 			pixels, width, height := imagerunner.Start(img)
 			createfile.CreateAlpha(pixels, uri, width, height)
+			createfile.CreatePreview(pixels, uri, width, height)
 		}
 
 	}
