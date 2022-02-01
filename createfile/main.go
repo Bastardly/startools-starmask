@@ -57,10 +57,10 @@ func CreatePreview(pixels [][]imagerunner.Pixel, uri string, width, height int) 
 		for x := 0; x < width; x++ {
 			pixel := pixels[y][x]
 
-			r := uint8(pixel.R * 257)
-			g := uint8(pixel.G * 257)
-			b := uint8(pixel.B * 257)
-			a := uint8(pixel.A * 257)
+			r := uint8(pixel.R / 257)
+			g := uint8(pixel.G / 257)
+			b := uint8(pixel.B / 257)
+			a := uint8(pixel.A / 257)
 
 			color := color.RGBA{r, g, b, a}
 
