@@ -85,9 +85,17 @@ func (p *Pixel) markAsStarIfWithinRange(centerRow, centerCol, starRadius, starRo
 	p.IsStar = float64(starRadius) > distance
 }
 
-func (p *Pixel) modifyColors(procentage float64, pxR, pxG, pxB, scR, scG, scB uint32) {
+func (p *Pixel) modifyColors(procentage float64, pxColor, srcColor Color) {
 
-	p.R = colortools.ChannelBlendByProcentage(procentage, pxR, scR)
-	p.G = colortools.ChannelBlendByProcentage(procentage, pxG, scG)
-	p.B = colortools.ChannelBlendByProcentage(procentage, pxB, scB)
+	p.R = colortools.ChannelBlendByProcentage(procentage, pxColor.R, srcColor.R)
+	p.G = colortools.ChannelBlendByProcentage(procentage, pxColor.G, srcColor.G)
+	p.B = colortools.ChannelBlendByProcentage(procentage, pxColor.B, srcColor.B)
+}
+
+func (p *Pixel) setMixedColor(firstColor, oppositeColor Color, steps int) {
+	color := colortools.MixColors(firstColor, oppositeColor, steps)
+	p.R = color.R
+	p.G = color.G
+	p.B = color.B
+	p.IsMapped = true
 }

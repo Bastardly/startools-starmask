@@ -7,8 +7,8 @@ import (
 
 func Start(img image.Image) ([][]Pixel, int, int) {
 	mockSettings := Settings{
-		maxStarSizeInPx:     10,
-		maxStarGlowInPx:     5,
+		maxStarSizeInPx:     6,
+		maxStarGlowInPx:     12,
 		wcagContrastMinimum: 1.3,
 	}
 

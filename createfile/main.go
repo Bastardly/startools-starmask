@@ -23,17 +23,12 @@ func CreateAlpha(pixels [][]imagerunner.Pixel, uri string, width, height int) {
 		for x := 0; x < width; x++ {
 			pixel := pixels[y][x]
 
-			t := color.RGBA{255, 0, 0, 255}
-			w := color.RGBA{255, 255, 255, 255}
-			b := color.RGBA{0, 0, 0, 255}
-
 			switch {
-			case pixel.IsStar:
-				img.Set(x, y, t)
-			case pixel.IsValid():
-				img.Set(x, y, w)
+			case pixel.IsMapped:
+				img.Set(x, y, color.White)
+
 			default:
-				img.Set(x, y, b)
+				img.Set(x, y, color.Black)
 			}
 		}
 	}

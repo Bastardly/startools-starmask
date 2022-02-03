@@ -10,7 +10,7 @@ func rgbaToPixel(R uint32, G uint32, B uint32, A uint32) Pixel {
 	b := uint8(B / bitDivider)
 	brightness := colortools.GetRGBBrightNess(r, g, b)
 
-	return Pixel{R, G, B, A, brightness, false, false, false, false, false, -1, -1, -1, -1, -1}
+	return Pixel{R, G, B, A, brightness, false, false, false, false, false, false, -1, -1, -1, -1, -1}
 }
 
 // validateCoord makes sure the calculated coordinate stays within table

@@ -1,5 +1,7 @@
 package imagerunner
 
+import "starkiller/colortools"
+
 type Pixel struct {
 	R                           uint32
 	G                           uint32
@@ -10,12 +12,13 @@ type Pixel struct {
 	HasContrastChangeVertical   bool
 	HasBeenExplored             bool
 	IsStar                      bool
+	IsMapped                    bool // When we mask a star, the mask color is available. So we mark this star as mapped. So we can use the color
 	isStarCenter                bool // Center of star, from where we will calculate it's final size with glow
 	starRadiusStartHorizontal   int
 	starRadiusEndHorizontal     int
 	starRadiusStartVertical     int
 	starRadiusEndVertical       int
-	starRadius int
+	starRadius                  int
 }
 
 type Settings struct {
@@ -36,4 +39,10 @@ type Store struct {
 type ColorCoord struct {
 	row int
 	col int
+}
+
+type Color = colortools.Color
+
+type StarFrame struct {
+	startRow, startCol, endRow, endCol int
 }
