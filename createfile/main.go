@@ -21,10 +21,8 @@ func CreateAlpha(pixels [][]imagerunner.Pixel, uri string, width, height int) {
 	// Set color for each pixel.
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			pixel := pixels[y][x]
-
 			switch {
-			case pixel.IsMapped:
+			case pixels[y][x].IsStar:
 				img.Set(x, y, color.White)
 
 			default:
@@ -50,12 +48,11 @@ func CreatePreview(pixels [][]imagerunner.Pixel, uri string, width, height int) 
 	// Set color for each pixel.
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			pixel := pixels[y][x]
 
-			r := uint8(pixel.R / 257)
-			g := uint8(pixel.G / 257)
-			b := uint8(pixel.B / 257)
-			a := uint8(pixel.A / 257)
+			r := uint8(pixels[y][x].R / 257)
+			g := uint8(pixels[y][x].G / 257)
+			b := uint8(pixels[y][x].B / 257)
+			a := uint8(pixels[y][x].A / 257)
 
 			color := color.RGBA{r, g, b, a}
 

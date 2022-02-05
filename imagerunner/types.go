@@ -1,6 +1,9 @@
 package imagerunner
 
-import "starkiller/colortools"
+import (
+	"starkiller/colortools"
+	"sync"
+)
 
 type Pixel struct {
 	R                           uint32
@@ -8,6 +11,7 @@ type Pixel struct {
 	B                           uint32
 	A                           uint32
 	brightness                  float32 // WCAG brightness made from 8bit estimate
+	glowStrength                float64 // Procentage marked from 0 - 1 - We use this to calculate how hard it needs to be masked.
 	HasContrastChangeHorizontal bool
 	HasContrastChangeVertical   bool
 	HasBeenExplored             bool
@@ -18,12 +22,15 @@ type Pixel struct {
 	starRadiusEndHorizontal     int
 	starRadiusStartVertical     int
 	starRadiusEndVertical       int
-	starRadius                  int
+	starCoreRadius              float64
+	starRadius                  float64
+	mu                          sync.Mutex
 }
 
 type Settings struct {
 	maxStarSizeInPx     int
-	maxStarGlowInPx     int
+	maxStarGlowInPx     float64
+	starRadiusModifier     float64
 	wcagContrastMinimum float32 // The highter the star contrast is needed for detection.
 }
 
