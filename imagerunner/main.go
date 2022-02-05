@@ -6,22 +6,7 @@ import (
 	"sync"
 )
 
-func Start(img image.Image) ([][]Pixel, int, int) {
-	mockSettings := Settings{
-		starRadiusModifier:  2,
-		maxStarSizeInPx:     5,
-		maxStarGlowInPx:     2,
-		wcagContrastMinimum: 1.3,
-	}
-
-	var store = Store{
-		0, 0,
-		mockSettings,
-		[][]Pixel{},
-	}
-
-	store.fillStore(img)
-
+func run(store Store) ([][]Pixel, int, int) {
 	var wg sync.WaitGroup
 
 	wg.Add(2)
@@ -37,4 +22,35 @@ func Start(img image.Image) ([][]Pixel, int, int) {
 	fmt.Println("markStarRadiusAsStar done")
 
 	return store.Pixels, store.Width, store.Height
+}
+
+func Start(img image.Image) ([][]Pixel, int, int) {
+	initialSettings := Settings{
+		starRadiusModifier:  2,
+		maxStarSizeInPx:     2,
+		maxStarGlowInPx:     2,
+		wcagContrastMinimum: 1.3,
+	}
+	mockSettings := Settings{
+		starRadiusModifier:  2,
+		maxStarSizeInPx:     5,
+		maxStarGlowInPx:     2,
+		wcagContrastMinimum: 1.5,
+	}
+
+	var store = Store{
+		0, 0,
+		initialSettings,
+		[][]Pixel{},
+	}
+
+	// todo - Validate settings. If stars are too small, no need to run it twice.
+
+	store.fillStore(img)
+	// First we remove tiny stars
+	run(store)
+	store.settings = mockSettings
+	// Then we run it again, and remove larger files.
+	return run(store)
+
 }
