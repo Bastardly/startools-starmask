@@ -27,15 +27,10 @@ func run(store Store) ([][]Pixel, int, int) {
 func Start(img image.Image) ([][]Pixel, int, int) {
 	initialSettings := Settings{
 		starRadiusModifier:  2,
-		maxStarSizeInPx:     2,
-		maxStarGlowInPx:     2,
-		wcagContrastMinimum: 1.3,
-	}
-	mockSettings := Settings{
-		starRadiusModifier:  2,
-		maxStarSizeInPx:     5,
-		maxStarGlowInPx:     2,
-		wcagContrastMinimum: 1.5,
+		maxStarSizeInPx:     4,
+		maxStarGlowInPx:     4,
+		wcagContrastMinimum: 1.2,
+		blendMode:           "cloneStamp",
 	}
 
 	var store = Store{
@@ -48,8 +43,8 @@ func Start(img image.Image) ([][]Pixel, int, int) {
 
 	store.fillStore(img)
 	// First we remove tiny stars
-	run(store)
-	store.settings = mockSettings
+	// run(store)
+	// store.clearStars()
 	// Then we run it again, and remove larger files.
 	return run(store)
 

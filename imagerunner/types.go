@@ -30,8 +30,9 @@ type Pixel struct {
 type Settings struct {
 	maxStarSizeInPx     int
 	maxStarGlowInPx     float64
-	starRadiusModifier     float64
+	starRadiusModifier  float64
 	wcagContrastMinimum float32 // The highter the star contrast is needed for detection.
+	blendMode           string // "fast" or "cloneStamp"
 }
 
 type Pixels = [][]Pixel

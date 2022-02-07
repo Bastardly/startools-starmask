@@ -244,14 +244,27 @@ func (store Store) markStarRadiusAsStar() {
 func (store Store) markStarAreas(centerRow, centerCol, startRow, startCol, endRow, endCol int) {
 	var starRadius = store.Pixels[centerRow][centerCol].starRadius
 	var starCoreRadius = store.Pixels[centerRow][centerCol].starCoreRadius
+	var wg sync.WaitGroup
 
 	for row := startRow; row <= endRow; row++ {
 		for col := startCol; col <= endCol; col++ {
-			store.Pixels[row][col].markAsStarIfWithinRange(centerRow, centerCol, row, col, starRadius, starCoreRadius)
+			wg.Add(1)
+
+			go func(goRow, goCol int) {
+				defer wg.Done()
+				store.Pixels[goRow][goCol].markAsStarIfWithinRange(centerRow, centerCol, goRow, goCol, starRadius, starCoreRadius)
+			}(row, col)
 		}
 	}
 
-	store.maskStarArea(startRow, startCol, endRow, endCol)
+	wg.Wait()
+
+	if store.settings.blendMode == "fast" {
+		// Copy color from 4 directions
+		store.maskStarArea(startRow, startCol, endRow, endCol)
+	} else if store.settings.blendMode == "cloneStamp" {
+		store.cloneStampArea(centerRow, centerCol, startRow, startCol, endRow, endCol, starRadius)
+	}
 }
 
 func (store Store) getPixelColorFromCoords(row, col int) Color {
@@ -264,91 +277,17 @@ func (store Store) getPixelColorFromCoords(row, col int) Color {
 	return store.Pixels[row][col].getColor()
 }
 
-func (store Store) maskStarArea(startRow, startCol, endRow, endCol int) {
-	numberOfRows := endRow - startRow
-	numberOfCols := endCol - startCol
+func (store Store) comparePixelBrightness(row1, row2, col1, col2 int) float64 {
+	brightness1 := float64(store.Pixels[row1][col1].brightness)
+	brightness2 := float64(store.Pixels[row2][col2].brightness)
 
-	if numberOfCols < 1 || numberOfRows < 1 {
-		return
-	}
+	return (math.Abs(brightness1-brightness2) / brightness1)
+}
 
-	var wg sync.WaitGroup
-	numberOfRowsF64 := float64(numberOfRows)
-	numberOfColsF64 := float64(numberOfCols)
-
-	horizontal := func(reverse bool) {
-		defer wg.Done()
-		modifier, rowS, colS := getCorrectStartColsAndRowsIfReversed(startRow, startCol, endRow, endCol, reverse)
-		// For each column, I need to find the row that contains the color I want.
-		colorList := make([]int, numberOfCols+1)
-
-		for row := 0; row <= numberOfRows; row++ {
-			for col := 0; col <= numberOfCols; col++ {
-				wg.Add(1)
-				targetRow := rowS + (row * modifier)
-				targetCol := colS + (col * modifier)
-				if row == 0 {
-					colorList[col] = targetRow
-				}
-				go func(goRow, goCol, colorIndex int) {
-					defer wg.Done()
-					if store.Pixels[goRow][goCol].IsStar || store.Pixels[goRow][goCol].glowStrength > 0 {
-						sourceColorRow := colorList[colorIndex]
-						pxColor := store.getPixelColorFromCoords(goRow, goCol)
-						srcColor := store.getPixelColorFromCoords(sourceColorRow, goCol)
-						distance := math.Abs(float64(sourceColorRow) - float64(goRow))
-						procentage := getRoundedFalloff(numberOfRowsF64, distance)
-						store.Pixels[goRow][goCol].modifyColors(procentage, pxColor, srcColor)
-
-					} else { //} if store.Pixels[goRow][goCol].brightness < store.Pixels[targetRow][targetCol].brightness {
-						colorList[colorIndex] = goRow
-					}
-
-				}(targetRow, targetCol, col)
+func (store Store) clearStars() {
+			for row := 0; row < store.Height; row++ {
+			for col := 0; col < store.Width; col++ {
+				store.Pixels[row][col].reset()
 			}
 		}
-	}
-
-	vertical := func(reverse bool) {
-		defer wg.Done()
-		modifier, rowS, colS := getCorrectStartColsAndRowsIfReversed(startRow, startCol, endRow, endCol, reverse)
-		// For each column, I need to find the row that contains the color I want.
-		colorList := make([]int, numberOfRows+1)
-
-		for col := 0; col <= numberOfCols; col++ {
-			for row := 0; row <= numberOfRows; row++ {
-				wg.Add(1)
-				targetRow := rowS + (row * modifier)
-				targetCol := colS + (col * modifier)
-				if col == 0 {
-					colorList[row] = targetCol
-				}
-				go func(goRow, goCol, colorIndex int) {
-					defer wg.Done()
-					if store.Pixels[goRow][goCol].IsStar || store.Pixels[goRow][goCol].glowStrength > 0 {
-						sourceColorCol := colorList[colorIndex]
-						pxColor := store.getPixelColorFromCoords(goRow, goCol)
-						scrColor := store.getPixelColorFromCoords(goRow, sourceColorCol)
-						distance := math.Abs(float64(sourceColorCol) - float64(goCol))
-						procentage := getRoundedFalloff(numberOfColsF64, distance)
-						store.Pixels[goRow][goCol].modifyColors(procentage, pxColor, scrColor)
-
-					} else { // if store.Pixels[goRow][goCol].brightness < store.Pixels[targetRow][targetCol].brightness {
-						colorList[colorIndex] = goCol
-					}
-
-				}(targetRow, targetCol, row)
-			}
-		}
-	}
-
-	wg.Add(4) // One for each direction!
-	go horizontal(false)
-	go horizontal(true)
-	go vertical(false)
-	go vertical(true)
-
-	//          todo Vertical also!
-
-	wg.Wait()
 }

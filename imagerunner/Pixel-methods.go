@@ -56,6 +56,30 @@ func (p *Pixel) modifyColors(procentage float64, pxColor, srcColor Color) {
 	p.B = colortools.ChannelBlendByProcentage(procentage, pxColor.B, srcColor.B)
 }
 
+func (p *Pixel) reset() {
+	p.glowStrength = 0
+	p.HasContrastChangeHorizontal = false
+	p.HasContrastChangeVertical = false
+	p.HasBeenExplored = false
+	p.IsStar = false
+	p.IsMapped = false
+	p.isStarCenter = false
+}
+
 func (p *Pixel) getColor() Color {
 	return Color{R: p.R, G: p.G, B: p.B}
+}
+
+func (p *Pixel) setColor(color Color) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	procentage := p.glowStrength // 0 - 1, 1 == 100%
+	if p.IsStar {
+		procentage = 1
+	}
+
+	p.R = colortools.ChannelBlendByProcentage(procentage, p.R, color.R)
+	p.G = colortools.ChannelBlendByProcentage(procentage, p.G, color.G)
+	p.B = colortools.ChannelBlendByProcentage(procentage, p.B, color.B)
+
 }
