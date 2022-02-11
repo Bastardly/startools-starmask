@@ -1,5 +1,7 @@
 package imagerunner
 
+import "math"
+
 // bitDivider is the 16 bit to 8 bit divider
 const bitDivider = 257
 
@@ -9,6 +11,8 @@ const extraPixel = 1
 const zero64 = float64(0)
 const one64 = float64(1)
 const two64 = float64(2)
+const halfPI = math.Pi / 2
+const oneAndAHalfPI = halfPI * 3
 
 // For calculating the procentage
 const hundred = float64(100)

@@ -27,9 +27,9 @@ func run(store Store) ([][]Pixel, int, int) {
 func Start(img image.Image) ([][]Pixel, int, int) {
 	initialSettings := Settings{
 		starRadiusModifier:  2,
-		maxStarSizeInPx:     4,
-		maxStarGlowInPx:     4,
-		wcagContrastMinimum: 1.2,
+		maxStarSizeInPx:     6,
+		maxStarGlowInPx:     3,
+		wcagContrastMinimum: 1.4,
 		blendMode:           "cloneStamp",
 	}
 

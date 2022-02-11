@@ -45,15 +45,33 @@ func (p *Pixel) markAsStarIfWithinRange(centerRow, centerCol, starRow, starCol i
 	}
 }
 
-func (p *Pixel) modifyColors(procentage float64, pxColor, srcColor Color) {
+func (p *Pixel) modifyColors(procentage float64, baseColor, mixColor Color) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if !p.IsStar {
 		procentage *= p.glowStrength
 	}
-	p.R = colortools.ChannelBlendByProcentage(procentage, pxColor.R, srcColor.R)
-	p.G = colortools.ChannelBlendByProcentage(procentage, pxColor.G, srcColor.G)
-	p.B = colortools.ChannelBlendByProcentage(procentage, pxColor.B, srcColor.B)
+	p.R = colortools.ChannelBlendByProcentage(procentage, baseColor.R, mixColor.R)
+	p.G = colortools.ChannelBlendByProcentage(procentage, baseColor.G, mixColor.G)
+	p.B = colortools.ChannelBlendByProcentage(procentage, baseColor.B, mixColor.B)
+}
+
+func (p *Pixel) mixWithPixelColor(mixProcentage float64, baseColor, mixColor Color) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	r := colortools.ChannelBlendByProcentage(mixProcentage, baseColor.R, mixColor.R)
+	g := colortools.ChannelBlendByProcentage(mixProcentage, baseColor.G, mixColor.G)
+	b := colortools.ChannelBlendByProcentage(mixProcentage, baseColor.B, mixColor.B)
+
+	procentage := one64
+	if !p.IsStar {
+		procentage *= p.glowStrength
+	}
+
+	p.R = colortools.ChannelBlendByProcentage(procentage, p.R, r)
+	p.G = colortools.ChannelBlendByProcentage(procentage, p.G, g)
+	p.B = colortools.ChannelBlendByProcentage(procentage, p.B, b)
 }
 
 func (p *Pixel) reset() {
@@ -77,7 +95,6 @@ func (p *Pixel) setColor(color Color) {
 	if p.IsStar {
 		procentage = 1
 	}
-
 	p.R = colortools.ChannelBlendByProcentage(procentage, p.R, color.R)
 	p.G = colortools.ChannelBlendByProcentage(procentage, p.G, color.G)
 	p.B = colortools.ChannelBlendByProcentage(procentage, p.B, color.B)

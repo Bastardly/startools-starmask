@@ -230,6 +230,7 @@ func (store Store) markStarRadiusAsStar() {
 
 					startRow, startCol, endRow, endCol := store.Pixels[goRow][goCol].getSquareMapCoords(store, goRow, goCol)
 					store.markStarAreas(goRow, goCol, startRow, startCol, endRow, endCol)
+					store.runRadialStarMasking(goRow, goCol)
 
 				}
 			}(row, col)
@@ -252,6 +253,7 @@ func (store Store) markStarAreas(centerRow, centerCol, startRow, startCol, endRo
 
 			go func(goRow, goCol int) {
 				defer wg.Done()
+				// store.Pixels[goRow][goCol].calculateStarRadiusWithGlow(store.settings.maxStarGlowInPx) // bruges ikke ved radial mapping
 				store.Pixels[goRow][goCol].markAsStarIfWithinRange(centerRow, centerCol, goRow, goCol, starRadius, starCoreRadius)
 			}(row, col)
 		}
@@ -265,6 +267,51 @@ func (store Store) markStarAreas(centerRow, centerCol, startRow, startCol, endRo
 	} else if store.settings.blendMode == "cloneStamp" {
 		store.cloneStampArea(centerRow, centerCol, startRow, startCol, endRow, endCol, starRadius)
 	}
+}
+
+func (store Store) validatedRow(row int) int {
+	if row < 0 {
+		return 0
+	}
+	if row >= store.Height {
+		return store.Height - 1
+	}
+	return row
+}
+
+func (store Store) validatedColumn(col int) int {
+	if col < 0 {
+		return 0
+	}
+	if col >= store.Width {
+		return store.Width - 1
+	}
+	return col
+}
+
+func (store Store) getMaskPixel(row, col, radius int, goRowUp, goColUp bool) (int, int) {
+	rowMultiplier := -1
+	if goRowUp {
+		rowMultiplier = 1
+	}
+	colMultiplier := -1
+	if goColUp {
+		colMultiplier = 1
+	}
+	vRow := row
+	vCol := col
+	for r := 3; r < radius+3; r++ {
+		currentRadiusRow := r * rowMultiplier
+		currentRadiusCol := r * colMultiplier
+		vRow = store.validatedRow(row + currentRadiusRow)
+		vCol = store.validatedColumn(col + currentRadiusCol)
+		isValid := !store.Pixels[vRow][vCol].IsStar // && store.Pixels[vRow][vCol].brightness < 0.4
+		if isValid {
+			break
+		}
+	}
+
+	return vRow, vCol
 }
 
 func (store Store) getPixelColorFromCoords(row, col int) Color {
@@ -285,9 +332,9 @@ func (store Store) comparePixelBrightness(row1, row2, col1, col2 int) float64 {
 }
 
 func (store Store) clearStars() {
-			for row := 0; row < store.Height; row++ {
-			for col := 0; col < store.Width; col++ {
-				store.Pixels[row][col].reset()
-			}
+	for row := 0; row < store.Height; row++ {
+		for col := 0; col < store.Width; col++ {
+			store.Pixels[row][col].reset()
 		}
+	}
 }
