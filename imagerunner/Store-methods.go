@@ -57,9 +57,12 @@ func (store Store) mapAlphaAreasHorizontal(wg *sync.WaitGroup) {
 				if column-starAreaActiveFrom > store.settings.maxStarSizeInPx {
 					// Star is too big and we ignore it.
 					resetStarArea()
-				} else if starAreaBrightnessLimit > store.Pixels[row][column].brightness {
-					// We look for a brightness lower than starAreaBrightnessLimit
-					store.maskPixels(starAreaActiveFrom, column-1, row, column, false)
+				} else if starAreaBrightnessLimit > store.Pixels[row][column].brightness { // We look for a brightness lower than starAreaBrightnessLimit - We assume it becomes brigther, and then fades
+					if column-starAreaActiveFrom >= store.settings.minStarSizeInPx {
+						// We make sure the star is large enough
+						store.maskPixels(starAreaActiveFrom, column-1, row, column, false)
+					}
+
 					resetStarArea()
 				}
 				// Start star area
@@ -96,9 +99,10 @@ func (store Store) mapAlphaAreasVertical(wg *sync.WaitGroup) {
 				if row-starAreaActiveFrom > store.settings.maxStarSizeInPx {
 					// Star is too big and we ignore it.
 					resetStarArea()
-				} else if starAreaBrightnessLimit > store.Pixels[row][column].brightness {
-					// We look for a brightness lower than starAreaBrightnessLimit
-					store.maskPixels(starAreaActiveFrom, row-1, row, column, true)
+				} else if starAreaBrightnessLimit > store.Pixels[row][column].brightness { // We look for a brightness lower than starAreaBrightnessLimit - We assume it becomes brigther, and then fades
+					if row-starAreaActiveFrom >= store.settings.minStarSizeInPx {
+						store.maskPixels(starAreaActiveFrom, row-1, row, column, true)
+					}
 					resetStarArea()
 				}
 				// Start star area
