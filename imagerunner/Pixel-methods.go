@@ -99,9 +99,9 @@ func (p *Pixel) setColor(color Color) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	procentage := p.glowStrength // 0 - 1, 1 == 100%
-	if p.IsStar {
-		procentage = 1
-	}
+	//if p.IsStar {
+	procentage = 1
+	//}
 	p.R = colortools.ChannelBlendByProcentage(procentage, p.R, color.R)
 	p.G = colortools.ChannelBlendByProcentage(procentage, p.G, color.G)
 	p.B = colortools.ChannelBlendByProcentage(procentage, p.B, color.B)
