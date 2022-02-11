@@ -18,6 +18,7 @@ func rgbaToPixel(R uint32, G uint32, B uint32, A uint32) Pixel {
 		A:                           A,
 		brightness:                  colortools.GetRGBBrightNess(r, g, b),
 		glowStrength:                0,
+		radialGlowStrength:          0,
 		HasContrastChangeHorizontal: false,
 		HasContrastChangeVertical:   false,
 		HasBeenExplored:             false,

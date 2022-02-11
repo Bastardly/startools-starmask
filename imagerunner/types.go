@@ -12,6 +12,7 @@ type Pixel struct {
 	A                           uint32
 	brightness                  float32 // WCAG brightness made from 8bit estimate
 	glowStrength                float64 // Procentage marked from 0 - 1 - We use this to calculate how hard it needs to be masked.
+	radialGlowStrength          float64 // Procentage marked from 0 - 1 - We use this to calculate how hard it needs to be masked in radial blending mode.
 	HasContrastChangeHorizontal bool
 	HasContrastChangeVertical   bool
 	HasBeenExplored             bool
@@ -32,7 +33,7 @@ type Settings struct {
 	maxStarGlowInPx     float64
 	starRadiusModifier  float64
 	wcagContrastMinimum float32 // The highter the star contrast is needed for detection.
-	blendMode           string // "fast" or "cloneStamp"
+	blendMode           string  // "fast" or "cloneStamp"
 }
 
 type Pixels = [][]Pixel

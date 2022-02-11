@@ -39,10 +39,17 @@ func (p *Pixel) markAsStarIfWithinRange(centerRow, centerCol, starRow, starCol i
 
 	p.IsStar = p.IsStar || c2 <= starCoreRadius
 	if c2 < starRadius {
+		// For clone stamp mapping
 		glowMaxDistance := starRadius - starCoreRadius
 		glowDistance := c2 - starCoreRadius
 		p.glowStrength = getRoundedFalloff(glowMaxDistance, glowDistance)
+
+		// For radial mapping
+		// radialGlowDistance := c2 - starRadius
+		// p.radialGlowStrength = getRoundedFalloff(starRadius, radialGlowDistance)
+
 	}
+
 }
 
 func (p *Pixel) modifyColors(procentage float64, baseColor, mixColor Color) {
@@ -98,5 +105,13 @@ func (p *Pixel) setColor(color Color) {
 	p.R = colortools.ChannelBlendByProcentage(procentage, p.R, color.R)
 	p.G = colortools.ChannelBlendByProcentage(procentage, p.G, color.G)
 	p.B = colortools.ChannelBlendByProcentage(procentage, p.B, color.B)
+}
 
+func (p *Pixel) setRadialColor(color Color) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	procentage := p.radialGlowStrength // 0 - 1, 1 == 100%
+	p.R = colortools.ChannelBlendByProcentage(procentage, p.R, color.R)
+	p.G = colortools.ChannelBlendByProcentage(procentage, p.G, color.G)
+	p.B = colortools.ChannelBlendByProcentage(procentage, p.B, color.B)
 }
