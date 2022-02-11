@@ -43,13 +43,13 @@ func (store Store) findCloneArea(centerRow, centerCol, startRow, startCol, endRo
 		}
 
 		hasStar := false
-		for row := cloneRowStart; row < cloneRowEnd; row++ {
-			for col := cloneColStart; col < cloneColEnd; col++ {
-				if store.Pixels[row][col].IsStar || store.Pixels[row][col].glowStrength > 0.1 || store.Pixels[row][col].brightness > 0.8 {
-					hasStar = true
-				}
-			}
-		}
+		// for row := cloneRowStart; row < cloneRowEnd; row++ {
+		// 	for col := cloneColStart; col < cloneColEnd; col++ {
+		// 		if store.Pixels[row][col].IsStar || store.Pixels[row][col].glowStrength > 0.1 || store.Pixels[row][col].brightness > 0.8 {
+		// 			hasStar = true
+		// 		}
+		// 	}
+		// }
 		diff := store.comparePixelBrightness(startRow, cloneRowStart, startCol, cloneColStart) + store.comparePixelBrightness(endRow, cloneRowEnd, endCol, cloneColEnd)
 		if diff < lowestDiff && !hasStar {
 			lowestDiff = diff

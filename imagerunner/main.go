@@ -33,22 +33,22 @@ func Start(img image.Image) ([][]Pixel, int, int) {
 		wcagContrastMinimum: 1.7,
 		blendMode:           "cloneStamp",
 	}
-	// initialSettingsSmall := Settings{
-	// 	starRadiusModifier:  2,
-	// 	maxStarSizeInPx:     7,
-	// 	minStarSizeInPx:     4,
-	// 	maxStarGlowInPx:     4,
-	// 	wcagContrastMinimum: 1.2,
-	// 	blendMode:           "cloneStamp",
-	// }
-	// initialSettingsSmall2 := Settings{
-	// 	starRadiusModifier:  1,
-	// 	maxStarSizeInPx:     4,
-	// 	minStarSizeInPx:     1,
-	// 	maxStarGlowInPx:     2,
-	// 	wcagContrastMinimum: 1.1,
-	// 	blendMode:           "cloneStamp",
-	// }
+	initialSettingsSmall := Settings{
+		starRadiusModifier:  2,
+		maxStarSizeInPx:     7,
+		minStarSizeInPx:     4,
+		maxStarGlowInPx:     4,
+		wcagContrastMinimum: 1.7,
+		blendMode:           "cloneStamp",
+	}
+	initialSettingsSmall2 := Settings{
+		starRadiusModifier:  1,
+		maxStarSizeInPx:     4,
+		minStarSizeInPx:     1,
+		maxStarGlowInPx:     2,
+		wcagContrastMinimum: 1.7,
+		blendMode:           "cloneStamp",
+	}
 
 	var store = Store{
 		0, 0,
@@ -60,14 +60,14 @@ func Start(img image.Image) ([][]Pixel, int, int) {
 
 	store.fillStore(img)
 
-	// run(store)
-	// store.clearStars()
-	// store.settings = initialSettingsSmall
-	// run(store)
-	// store.clearStars()
-	// store.settings = initialSettingsSmall2
-	// run(store)
-	// store.clearStars()
+	run(store)
+	store.clearStars()
+	store.settings = initialSettingsSmall
+	run(store)
+	store.clearStars()
+	store.settings = initialSettingsSmall2
+	run(store)
+	store.clearStars()
 	// Then we run it again, and remove larger files.
 	return run(store)
 

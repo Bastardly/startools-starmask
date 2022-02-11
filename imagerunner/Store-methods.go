@@ -234,7 +234,7 @@ func (store Store) markStarRadiusAsStar() {
 
 					startRow, startCol, endRow, endCol := store.Pixels[goRow][goCol].getSquareMapCoords(store, goRow, goCol)
 					store.markStarAreas(goRow, goCol, startRow, startCol, endRow, endCol)
-					store.runRadialStarMasking(goRow, goCol)
+					// store.runRadialStarMasking(goRow, goCol)
 
 				}
 			}(row, col)

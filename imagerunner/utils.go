@@ -66,7 +66,7 @@ func getCorrectStartColsAndRowsIfReversed(startRow, startCol, endRow, endCol int
 
 func getRoundedFalloff(max, position float64) float64 {
 	if max > 8 {
-		return math.Pow((max-position)/max, 2)
+		return math.Pow((max-position)/max, 1.5)
 	}
 	return (max - position) / max
 }
