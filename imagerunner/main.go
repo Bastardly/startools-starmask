@@ -31,6 +31,7 @@ func Start(img image.Image) ([][]Pixel, int, int) {
 		minStarSizeInPx:     7,
 		maxStarGlowInPx:     8,
 		wcagContrastMinimum: 1.7,
+		radialMaskStrength: 0.3,
 		blendMode:           "cloneStamp",
 	}
 	initialSettingsSmall := Settings{
@@ -39,6 +40,7 @@ func Start(img image.Image) ([][]Pixel, int, int) {
 		minStarSizeInPx:     4,
 		maxStarGlowInPx:     4,
 		wcagContrastMinimum: 1.7,
+		radialMaskStrength: 0.3,
 		blendMode:           "cloneStamp",
 	}
 	initialSettingsSmall2 := Settings{
@@ -47,6 +49,7 @@ func Start(img image.Image) ([][]Pixel, int, int) {
 		minStarSizeInPx:     1,
 		maxStarGlowInPx:     2,
 		wcagContrastMinimum: 1.7,
+		radialMaskStrength: 0.3,
 		blendMode:           "cloneStamp",
 	}
 

@@ -32,6 +32,7 @@ type Settings struct {
 	maxStarSizeInPx     int
 	minStarSizeInPx     int
 	maxStarGlowInPx     float64
+	radialMaskStrength  float64 // Procentage marked from 0 - 1 - We use this to calculate the maximum power of the radial mask.
 	starRadiusModifier  float64
 	wcagContrastMinimum float32 // The highter the star contrast is needed for detection.
 	blendMode           string  // "fast" or "cloneStamp"

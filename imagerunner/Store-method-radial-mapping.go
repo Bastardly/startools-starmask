@@ -35,9 +35,9 @@ func (store Store) runRadialStarMasking(row, col int) {
 
 			// We add the glow strength for this radius
 			store.Pixels[topRow][topCol].radialGlowStrength = radialGlowStrength
-			store.Pixels[topRow][topCol].setRadialColor(color)
+			store.Pixels[topRow][topCol].setRadialColor(color, store.settings.radialMaskStrength)
 			store.Pixels[topRow2][topCol2].radialGlowStrength = radialGlowStrength
-			store.Pixels[topRow2][topCol2].setRadialColor(color)
+			store.Pixels[topRow2][topCol2].setRadialColor(color, store.settings.radialMaskStrength)
 		}
 
 	}

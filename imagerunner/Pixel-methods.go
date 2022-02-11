@@ -111,10 +111,10 @@ func (p *Pixel) setColor(color Color) {
 	p.B = colortools.ChannelBlendByProcentage(procentage, p.B, color.B)
 }
 
-func (p *Pixel) setRadialColor(color Color) {
+func (p *Pixel) setRadialColor(color Color, radialMaskStrength float64) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	procentage := p.radialGlowStrength // 0 - 1, 1 == 100%
+	procentage := p.radialGlowStrength * radialMaskStrength // 0 - 1, 1 == 100%
 	p.R = colortools.ChannelBlendByProcentage(procentage, p.R, color.R)
 	p.G = colortools.ChannelBlendByProcentage(procentage, p.G, color.G)
 	p.B = colortools.ChannelBlendByProcentage(procentage, p.B, color.B)
