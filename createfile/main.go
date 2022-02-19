@@ -10,9 +10,13 @@ import (
 	"starkiller/imagerunner"
 )
 
-func CreateAlpha(pixels [][]imagerunner.Pixel, uri string, width, height int) {
+func CreateAlpha(pixels [][]imagerunner.Pixel, uri, filePrefixEntry string, width, height int) {
 	dir := filepath.Dir(uri)
-	fileName := filepath.Join(dir, "alpha.png")
+	fileName := "alpha.png"
+	if filePrefixEntry != "" {
+		fileName = filePrefixEntry + "-" + fileName
+	}
+	fileNamePath := filepath.Join(dir, fileName)
 	upLeft := image.Point{0, 0}
 	lowRight := image.Point{width, height}
 
@@ -32,12 +36,12 @@ func CreateAlpha(pixels [][]imagerunner.Pixel, uri string, width, height int) {
 	}
 
 	// Encode as PNG.
-	f, _ := os.Create(fileName)
+	f, _ := os.Create(fileNamePath)
 	png.Encode(f, img)
 	f.Close()
 }
 
-func CreatePreview(pixels [][]imagerunner.Pixel, uri string, width, height int) {
+func CreatePreview(pixels [][]imagerunner.Pixel, uri, filePrefixEntry string, width, height int) {
 	dir := filepath.Dir(uri)
 	fileName := filepath.Join(dir, "preview.png")
 	upLeft := image.Point{0, 0}

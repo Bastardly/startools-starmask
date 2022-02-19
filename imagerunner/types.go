@@ -1,6 +1,7 @@
 package imagerunner
 
 import (
+	"image"
 	"starkiller/colortools"
 	"sync"
 )
@@ -36,6 +37,15 @@ type Settings struct {
 	starRadiusModifier  float64
 	wcagContrastMinimum float32 // The highter the star contrast is needed for detection.
 	blendMode           string  // "fast" or "cloneStamp"
+}
+
+type IStart = struct {
+	ImageFile        *image.Image
+	RemoveStars      bool
+	CreateAlpha      bool
+	MinStarSize      int
+	MaxStarSize      int
+	MinContrastRatio float32
 }
 
 type Pixels = [][]Pixel

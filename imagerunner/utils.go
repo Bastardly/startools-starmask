@@ -1,6 +1,7 @@
 package imagerunner
 
 import (
+	"fmt"
 	"math"
 	"starkiller/colortools"
 	"sync"
@@ -69,4 +70,42 @@ func getRoundedFalloff(max, position float64) float64 {
 		return math.Pow((max-position)/max, 1.5)
 	}
 	return (max - position) / max
+}
+
+func getSettings(data IStart) []Settings {
+	initStarSize := data.MaxStarSize
+	initContras := data.MinContrastRatio
+	var settings []Settings
+
+	for initStarSize > data.MinStarSize {
+		starRadiusModifier := math.Max(1, float64(initStarSize/3))
+		initStarMod := int(starRadiusModifier)
+		minStarSizeInPx := int(math.Max(1, float64(initStarSize-initStarMod)))
+		maxStarGlowInPx := float64(initStarSize) * 2
+
+		settings = append(settings, Settings{
+			starRadiusModifier:  starRadiusModifier,
+			maxStarSizeInPx:     initStarSize,
+			minStarSizeInPx:     minStarSizeInPx,
+			maxStarGlowInPx:     maxStarGlowInPx,
+			wcagContrastMinimum: initContras,
+			radialMaskStrength:  0.3,
+			blendMode:           "cloneStamp",
+		})
+
+		if !data.RemoveStars {
+			break
+		}
+
+		initStarSize -= initStarMod
+		initContras -= 0.1
+	}
+
+	if len(settings) == 0 {
+		fmt.Println("startStarSize: ", data.MaxStarSize, "startContras", data.MinContrastRatio)
+		panic("Oh dear, we got no settings!")
+	}
+
+	return settings
+
 }
