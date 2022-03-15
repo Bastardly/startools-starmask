@@ -2,21 +2,34 @@ package ui
 
 import (
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 )
 
-func GetHeader() *fyne.Container {
-	title := getText("STAR TOOLS 3000")
+func GetHeader(resource fyne.Resource) *fyne.Container {
+	title := getText("STAR TOOLS 3000 - STAR MASK")
 	title.TextSize = 30
 
-	quote := getText("\"Brother Maynard – bring forth the holy hand grenade!\"")
-	quote.TextStyle.Italic = true
+	image := canvas.NewImageFromResource(resource)
+	image.SetMinSize(fyne.Size{Width: 50, Height: 50})
 
-	quoted := getText("- King Arthur")
-	quoted.TextStyle.Monospace = true
-	quoted.TextSize = 12
+	spacer := GetBlock(30)
 
-	return container.New(layout.NewVBoxLayout(), title, quote, quoted)
+	// c := canvas.NewImageFromImage(image)
+	// size := fyne.Size{
+	// 	Width: 500, Height: 500,
+	// }
+	// image.Resize(size)
+
+	// quote := getText("\"Brother Maynard – bring forth the holy hand grenade!\"")
+	// quote.TextStyle.Italic = true
+
+	// quoted := getText("- King Arthur")
+	// quoted.TextStyle.Monospace = true
+	// quoted.TextSize = 12
+
+	cont := container.New(layout.NewHBoxLayout(), image, title)
+	return container.New(layout.NewVBoxLayout(), cont, spacer)
 
 }

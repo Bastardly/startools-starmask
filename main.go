@@ -51,12 +51,12 @@ func main() {
 	a := app.New()
 
 	myWindow := a.NewWindow("STAR TOOLS 3000")
-	myWindow.Resize(fyne.NewSize(800, 600))
+	myWindow.Resize(fyne.NewSize(600, 550))
 
-	r, _ := fyne.LoadResourceFromPath("Icon2.png")
-	myWindow.SetIcon(r)
+	resource, _ := fyne.LoadResourceFromPath("Icon2.png")
+	myWindow.SetIcon(resource)
 
-	header := ui.GetHeader()
+	header := ui.GetHeader(resource)
 
 	// stepTwo := ui.GetStepTwo(func(b bool) {
 	// 	data.removeStars = b
@@ -76,6 +76,9 @@ func main() {
 		data.minStarSize = int(minStarSizeValue)
 		data.maxStarSize = int(maxStarSizeValue)
 		data.minContrastRatio = float32(contrastValue)
+		if data.minContrastRatio <= 0 {
+			data.minContrastRatio = 0.1
+		}
 		data.filePrefixEntry = filePrefixEntry
 
 		myWindow.SetContent(working)
@@ -106,8 +109,10 @@ func main() {
 			// stepThree.Show()
 		}
 	})
+	block := ui.GetBlock(20)
 
-	data.firstPage = container.New(layout.NewVBoxLayout(), header, stepOne, layout.NewSpacer(), stepTwoPartTwo, layout.NewSpacer())
+	content := container.New(layout.NewVBoxLayout(), header, stepOne, block, stepTwoPartTwo, layout.NewSpacer())
+	data.firstPage = container.New(layout.NewHBoxLayout(), block, content, block)
 
 	myWindow.SetContent(data.firstPage)
 	myWindow.ShowAndRun()

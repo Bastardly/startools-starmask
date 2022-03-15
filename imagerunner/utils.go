@@ -74,7 +74,7 @@ func getRoundedFalloff(max, position float64) float64 {
 
 func getSettings(data IStart) []Settings {
 	initStarSize := data.MaxStarSize
-	initContras := data.MinContrastRatio
+	initContras := 1.3 + data.MinContrastRatio // We need to keep this above 1.3, og else it will become too memory intensive.
 	var settings []Settings
 
 	for initStarSize > data.MinStarSize {

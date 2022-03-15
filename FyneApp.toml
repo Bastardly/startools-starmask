@@ -1,8 +1,8 @@
-Website = "https://example.com"
+Website = "https://startools.herokuapp.com/"
 
 [Details]
-  Icon = "Icon2.png"
-  Name = "StarTools3000"
+  Icon = "Icon.png"
+  Name = "ST3K_starmask_V1.0.1_win"
   ID = "com.example.app"
   Version = "1.0.1"
-  Build = 11
+  Build = 15

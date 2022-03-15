@@ -3,6 +3,7 @@ package ui
 import (
 	"image/color"
 
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/widget"
 )
@@ -50,4 +51,11 @@ func getStringInput(text, hint, initialValue string) (*widget.FormItem, *widget.
 	input.HintText = hint
 
 	return input, entry
+}
+
+func GetBlock(size float32) *canvas.Rectangle {
+	block := canvas.NewRectangle(color.Transparent)
+	block.SetMinSize(fyne.Size{Width: size, Height: size})
+
+	return block
 }

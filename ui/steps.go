@@ -19,26 +19,12 @@ func GetStepOne(getFile func()) *fyne.Container {
 	return container.New(layout.NewVBoxLayout(), btnContainer, helpfulText)
 }
 
-// func GetStepTwo(removeStars, createAlpha func(b bool)) *fyne.Container {
-// 	label := getText("STEP TWO: Select output- and star settings")
-// 	label.TextStyle.Monospace = true
-// 	areaText := getHelpfulText("Output settings")
-// 	removeStarsComponent := widget.NewCheck("An image with removed stars", removeStars)
-// 	createAlphaComponent := widget.NewCheck("A Star map - Great for post processing", createAlpha)
-
-// 	cont := container.New(layout.NewVBoxLayout(), label, areaText, removeStarsComponent, createAlphaComponent)
-// 	cont.Hidden = true
-
-// 	return cont
-// }
-
 func GetStepTwoPartTwo(SubmitText string, submitFunc func(_, _, _, _ string)) *fyne.Container {
 	label := getText("STEP TWO: Select star settings and run")
 	label.TextStyle.Monospace = true
-	areaText := getHelpfulText("Star settings")
 	minStarSize, minStarSizeEntry := getInput("Min star size (px)", "Set the minimum star diameter (Measured in pixels) to be included", "0")
 	maxStarSize, maxStarSizeEntry := getInput("Max star size (px)", "Set the maximum size of the star core without the glow (Measured in pixels)", "10")
-	minContrastRatio, minContrastRatioEntry := getInput("Star clarity", "How clear the stars must be. Putting this setting too low, will often mask too much (1.7 is a good start)", "1.7")
+	minContrastRatio, minContrastRatioEntry := getInput("Star clarity", "How weak stars we aim to include. A lower value will include weaker stars    ", "0.5")
 	filePrefix, filePrefixEntry := getStringInput("File prefix", "Prefix for your output file.", "")
 
 	form := &widget.Form{
@@ -52,10 +38,17 @@ func GetStepTwoPartTwo(SubmitText string, submitFunc func(_, _, _, _ string)) *f
 	form.SubmitText = SubmitText
 	helpfulText := getHelpfulText("Tip: Your output files will be placed in the same folder as your input file.")
 
-	cont := container.New(layout.NewVBoxLayout(), areaText, form, helpfulText)
+	cont := container.New(layout.NewVBoxLayout(), label, form, helpfulText)
 	cont.Hidden = true
 
 	return cont
+}
+
+func GetSplashScreen(text string) *fyne.Container {
+	label := getText(text)
+	labelContainer := container.New(layout.NewHBoxLayout(), layout.NewSpacer(), label, layout.NewSpacer())
+
+	return container.New(layout.NewVBoxLayout(), layout.NewSpacer(), labelContainer, layout.NewSpacer())
 }
 
 // func GetPartThree(method func()) *fyne.Container {
@@ -72,9 +65,15 @@ func GetStepTwoPartTwo(SubmitText string, submitFunc func(_, _, _, _ string)) *f
 // 	return cont
 // }
 
-func GetSplashScreen(text string) *fyne.Container {
-	label := getText(text)
-	labelContainer := container.New(layout.NewHBoxLayout(), layout.NewSpacer(), label, layout.NewSpacer())
+// func GetStepTwo(removeStars, createAlpha func(b bool)) *fyne.Container {
+// 	label := getText("STEP TWO: Select output- and star settings")
+// 	label.TextStyle.Monospace = true
+// 	areaText := getHelpfulText("Output settings")
+// 	removeStarsComponent := widget.NewCheck("An image with removed stars", removeStars)
+// 	createAlphaComponent := widget.NewCheck("A Star map - Great for post processing", createAlpha)
 
-	return container.New(layout.NewVBoxLayout(), layout.NewSpacer(), labelContainer, layout.NewSpacer())
-}
+// 	cont := container.New(layout.NewVBoxLayout(), label, areaText, removeStarsComponent, createAlphaComponent)
+// 	cont.Hidden = true
+
+// 	return cont
+// }
